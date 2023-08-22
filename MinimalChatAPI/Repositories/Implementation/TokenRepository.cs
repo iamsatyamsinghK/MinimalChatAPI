@@ -22,7 +22,10 @@ namespace MinimalChatAPI.Repositories.Implementation
             // Create Claims
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.Name),
+                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+
             };
 
             
