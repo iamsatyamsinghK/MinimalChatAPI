@@ -9,6 +9,9 @@ namespace MinimalChatAPI.Repositories.Interface
         Task<Message> SendMessageAsync(Message newMessage);
         
         Task<Message> EditMessageAsync( Message message);
+        Task<Message> DeleteMessageAsync(int MessageId);
+
+        Task<IEnumerable<Message>> GetConversationHistoryAsync(Message newMessage);
 
 
     }

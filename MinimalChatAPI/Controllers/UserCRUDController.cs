@@ -1,6 +1,9 @@
 ﻿using System.Security.Claims;
+using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MinimalChatAPI.Exception;
 using MinimalChatAPI.Models.Domain;
 using MinimalChatAPI.Models.DTO;
 using MinimalChatAPI.Repositories.Interface;
@@ -19,12 +22,13 @@ namespace MinimalChatAPI.Controllers
         }
 
         [HttpGet]
-
         [Authorize]
         public async Task<IActionResult> GetUserList()
         {
-            int callingUserId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            var ExtractedId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            //int callingUserId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
+            int callingUserId = Convert.ToInt32(ExtractedId);
 
             var users = await userRepository.GetUserListAsync(callingUserId);
 
@@ -51,6 +55,7 @@ namespace MinimalChatAPI.Controllers
             {
                 return BadRequest("Message content is required.");
             }
+            
 
             var ExtractedId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -62,22 +67,32 @@ namespace MinimalChatAPI.Controllers
                 Timestamp = DateTime.UtcNow
             };
 
-            await userRepository.SendMessageAsync(newMessage);
 
-            var response = new SendMessageResponseDto
+
+            try
             {
-                MessageId = newMessage.Id,
-                SenderId = newMessage.SenderId,
-                ReceiverId = newMessage.ReceiverId,
-                Content = newMessage.Content,
-                Timestamp = newMessage.Timestamp
-            };
+                await userRepository.SendMessageAsync(newMessage);
 
-            return Ok(response);
+                var response = new SendMessageResponseDto
+                {
+                    MessageId = newMessage.Id,
+                    SenderId = newMessage.SenderId,
+                    ReceiverId = newMessage.ReceiverId,
+                    Content = newMessage.Content,
+                    Timestamp = newMessage.Timestamp
+                };
+
+                return Ok(response);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
 
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> EditMessage([FromBody] EditMessageRequestDTO editDTO)
         {
             var ExtractedId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -90,7 +105,7 @@ namespace MinimalChatAPI.Controllers
 
             var message = new Message
             {
-                
+
                 Id = editDTO.MessageId,
                 Content = editDTO.Content,
             };
@@ -109,6 +124,88 @@ namespace MinimalChatAPI.Controllers
 
 
             return Ok("Message edited successfully.");
+
+        }
+
+        [HttpDelete]
+        [Route("{MessageId:int}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMessage([FromRoute] int MessageId)
+        {
+            var ExtractedId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = Convert.ToInt32(ExtractedId);
+
+            var message = await userRepository.DeleteMessageAsync(MessageId);
+
+            if (message == null)
+            {
+                return NotFound("Message not found.");
+            }
+
+            if (message.SenderId != userId)
+            {
+                return Unauthorized("You are not authorized to Delete this message.");
+            }
+
+
+            return Ok("Message Deleted successfully.");
+        }
+
+        [HttpGet]
+        [Route("messages")]
+        [Authorize]
+        public async Task<IActionResult> GetConversationHistory([FromQuery] ConversationHistoryRequestDto requestDto)
+        {
+            if (requestDto == null)
+            {
+                return BadRequest(" Invalid request parameters");
+            }
+
+            var ExtractedId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var newMessage = new Message
+            {
+                SenderId = Convert.ToInt32(ExtractedId),
+                ReceiverId = requestDto.UserId,
+                Timestamp = (DateTime)requestDto.Before,
+           
+            };
+
+            var conversations = await userRepository.GetConversationHistoryAsync(newMessage);
+
+            if (requestDto.Before.HasValue)
+            {
+                conversations = conversations.Where(m => m.Timestamp <= requestDto.Before);
+            }
+
+            // Apply sorting
+            if (requestDto.Sort.ToLower() == "desc")
+            {
+                conversations = conversations.OrderByDescending(m => m.Timestamp);
+            }
+            else
+            {
+                conversations = conversations.OrderBy(m => m.Timestamp);
+            }
+
+            // Limit the number of messages to be retrieved
+            conversations = conversations.Take(requestDto.Count);
+
+            var response = new List<ConversationHistoryResponseDto>();
+
+            foreach (var conversation in conversations)
+            {
+                response.Add(new ConversationHistoryResponseDto
+                {
+                    Id = conversation.Id,
+                    SenderId = conversation.SenderId,
+                    ReceiverId = conversation.ReceiverId,
+                    Content = conversation.Content,
+                    Timestamp = conversation.Timestamp
+                });
+            }
+
+            return Ok(response);
 
         }
     }
