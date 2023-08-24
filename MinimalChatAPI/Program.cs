@@ -3,15 +3,20 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MinimalChatAPI.Data;
+using MinimalChatAPI.Middleware;
 using MinimalChatAPI.Repositories.Implementation;
 using MinimalChatAPI.Repositories.Interface;
 using Microsoft.OpenApi.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+//builder.Services.AddScoped<ILogRepository, LogRepository>();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -50,11 +55,14 @@ builder.Services.AddSwaggerGen(options =>                   // Add Authorization
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("MinimalChatAPIConnectionString")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MinimalChatAPIConnectionString")),
+    ServiceLifetime.Scoped);
 
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ILogRepository, LogRepository>();
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>    // Injecting Authentication 
                                                                                                       // in services collection
@@ -81,8 +89,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.Run();
