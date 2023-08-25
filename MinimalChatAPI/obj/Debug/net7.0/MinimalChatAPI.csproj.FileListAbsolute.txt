@@ -7,6 +7,7 @@ C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Min
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\MinimalChatAPI.pdb
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Azure.Core.dll
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Azure.Identity.dll
+C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\BCrypt.Net-Next.dll
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Humanizer.dll
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Cryptography.Internal.dll
@@ -83,4 +84,3 @@ C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\obj\Debug\net7.0\ref
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\obj\Debug\net7.0\MinimalChatAPI.pdb
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\obj\Debug\net7.0\MinimalChatAPI.genruntimeconfig.cache
 C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\obj\Debug\net7.0\ref\MinimalChatAPI.dll
-C:\Users\admin\Desktop\Intern\MinimalChatAPI\MinimalChatAPI\bin\Debug\net7.0\BCrypt.Net-Next.dll
