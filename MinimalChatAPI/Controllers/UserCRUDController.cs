@@ -194,6 +194,8 @@ namespace MinimalChatAPI.Controllers
             var response = new List<ConversationHistoryResponseDto>();
 
             foreach (var conversation in conversations)
+                  
+
             {
                 response.Add(new ConversationHistoryResponseDto
                 {

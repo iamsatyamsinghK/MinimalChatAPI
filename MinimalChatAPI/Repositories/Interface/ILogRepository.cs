@@ -6,6 +6,6 @@ namespace MinimalChatAPI.Repositories.Interface
     public interface ILogRepository
     {
         //Task AddLogAsync(Log log);
-        Task<List<Log>> GetLogsAsync(LogFilter filter);
+        Task<List<Log>> GetLogsAsync(LogQueryParameters queryParameters);
     }
 }

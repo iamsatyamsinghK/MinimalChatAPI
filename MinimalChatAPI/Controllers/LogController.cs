@@ -13,25 +13,25 @@ namespace MinimalChatAPI.Controllers
     public class LogController : ControllerBase
     {
 
-        private readonly ILogRepository _logRepository;
+        private readonly ILogRepository logRepository;
 
         public LogController(ILogRepository logRepository)
         {
-            _logRepository = logRepository;
+            this.logRepository = logRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetLogs([FromQuery] LogQueryParameters queryParameters)
         {
-            var filter = new LogFilter
-            {
-                StartTime = queryParameters.StartTime,
-                EndTime = queryParameters.EndTime
-            };
+            //var filter = new LogFilter
+            //{
+            //    StartTime = queryParameters.StartTime,
+            //    EndTime = queryParameters.EndTime
+            //};
 
             try
             {
-                var logs = await _logRepository.GetLogsAsync(filter);
+                var logs = await logRepository.GetLogsAsync(queryParameters);
 
                 if (logs == null || logs.Count == 0)
                 {
@@ -44,8 +44,8 @@ namespace MinimalChatAPI.Controllers
                     response.Add(new LogDto
                     {
                         IpAddress = log.IpAddress,
-                        //Username = log.Username,
-                        //RequestPath = log.RequestPath,
+                        Username = log.Username,
+                       
                         RequestBody = log.RequestBody,
                         Timestamp = log.Timestamp
                     });
@@ -55,7 +55,7 @@ namespace MinimalChatAPI.Controllers
 
 
 
-                //return Ok(logs);
+                
             }
             catch (System.Exception ex)
             {

@@ -14,42 +14,19 @@ namespace MinimalChatAPI.Repositories.Implementation
         {
             _dbContext = dbContext;
         }
-        //public async Task AddLogAsync(Log log)
-        //{
-        //    _dbContext.Logs.Add(log);
-        //    await _dbContext.SaveChangesAsync();
-        //}
+        public async Task<List<Log>> GetLogsAsync(LogQueryParameters queryParameters)
+        {
+            DateTime currentTime = DateTime.Now;
+            DateTime defaultStartTime = currentTime.AddMinutes(-5);
 
-       
-            public async Task<List<Log>> GetLogsAsync(LogFilter filter)
-            {
-                 var logs = await _dbContext.Logs
-                        .Where(log => log.Timestamp >= filter.StartTime && log.Timestamp <= filter.EndTime)
-                        .ToListAsync();
+            DateTime startTime = queryParameters.StartTime ?? defaultStartTime;
+            DateTime endTime = queryParameters.EndTime ?? currentTime;
 
-                        return logs;
+            var logs = await _dbContext.Logs
+                .Where(log => log.Timestamp >= startTime && log.Timestamp <= endTime)
+                .ToListAsync();
 
-
-
-            //var logs = await _dbContext.Logs
-            //    .Where(log => log.Timestamp >= filter.StartTime && log.Timestamp <= filter.EndTime)
-            //    .ToListAsync();
-
-
-
-            //var logDtos = logs.Select(log => new LogDto
-            //{
-            //    IpAddress = log.IpAddress,
-            //    Username = log.Username,
-            //    RequestPath = log.RequestPath,
-            //    RequestBody = log.RequestBody,
-            //    Timestamp = log.Timestamp
-            //}).ToList();
-
-            // return logs;
-
-
-            
+            return logs;
         }
     }
 }
