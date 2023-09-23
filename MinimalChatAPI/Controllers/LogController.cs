@@ -23,11 +23,7 @@ namespace MinimalChatAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetLogs([FromQuery] LogQueryParameters queryParameters)
         {
-            //var filter = new LogFilter
-            //{
-            //    StartTime = queryParameters.StartTime,
-            //    EndTime = queryParameters.EndTime
-            //};
+           
 
             try
             {
@@ -45,7 +41,7 @@ namespace MinimalChatAPI.Controllers
                     {
                         IpAddress = log.IpAddress,
                         Username = log.Username,
-                       
+
                         RequestBody = log.RequestBody,
                         Timestamp = log.Timestamp
                     });
@@ -55,7 +51,7 @@ namespace MinimalChatAPI.Controllers
 
 
 
-                
+
             }
             catch (System.Exception ex)
             {

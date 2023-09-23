@@ -100,12 +100,11 @@ namespace MinimalChatAPI.Controllers
 
             if (editDTO == null || string.IsNullOrWhiteSpace(editDTO.Content))
             {
-                return BadRequest("Message content is required.");
+                return BadRequest(new { message = "Message content is required." });
             }
 
             var message = new Message
             {
-
                 Id = editDTO.MessageId,
                 Content = editDTO.Content,
             };
@@ -114,18 +113,17 @@ namespace MinimalChatAPI.Controllers
 
             if (message == null)
             {
-                return NotFound("Message not found.");
+                return NotFound(new { message = "Message not found." });
             }
 
             if (message.SenderId != userId)
             {
-                return Unauthorized("You are not authorized to edit this message.");
+                return Unauthorized(new { message = "You are not authorized to edit this message." });
             }
 
-
-            return Ok("Message edited successfully.");
-
+            return Ok(new { message = "Message edited successfully." });
         }
+
 
         [HttpDelete]
         [Route("{MessageId:int}")]
@@ -139,16 +137,16 @@ namespace MinimalChatAPI.Controllers
 
             if (message == null)
             {
-                return NotFound("Message not found.");
+                return NotFound(new { message = "Message not found." });
             }
 
             if (message.SenderId != userId)
             {
-                return Unauthorized("You are not authorized to Delete this message.");
+                return Unauthorized(new { message = "You are not authorized to Delete this message." });
             }
 
 
-            return Ok("Message Deleted successfully.");
+            return Ok(new { message = "Message Deleted successfully." });
         }
 
         [HttpGet]
@@ -167,7 +165,7 @@ namespace MinimalChatAPI.Controllers
             {
                 SenderId = Convert.ToInt32(ExtractedId),
                 ReceiverId = requestDto.UserId,
-                Timestamp = (DateTime)requestDto.Before,
+                //Timestamp = (DateTime)requestDto.Before,
            
             };
 
@@ -175,14 +173,18 @@ namespace MinimalChatAPI.Controllers
 
             if (requestDto.Before.HasValue)
             {
-                conversations = conversations.Where(m => m.Timestamp <= requestDto.Before);
+                conversations = conversations.Where(m => m.Timestamp < requestDto.Before.Value);
+            }
+            else
+            {
+                conversations = conversations.Where(m => m.Timestamp <=  DateTime.Now);
             }
 
             // Apply sorting
             if (requestDto.Sort.ToLower() == "desc")
             {
                 conversations = conversations.OrderByDescending(m => m.Timestamp);
-            }
+            } 
             else
             {
                 conversations = conversations.OrderBy(m => m.Timestamp);
