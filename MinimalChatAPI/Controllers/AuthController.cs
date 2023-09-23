@@ -89,7 +89,7 @@ namespace MinimalChatAPI.Controllers
 
             // Password is verified, proceed with generating JWT token and returning response
 
-            var jwtToken = _tokenRepository.CreateJwtToken(user);
+            var jwtToken = _tokenRepository.CreateJwtToken (user);
 
             var response = new LoginResponseDto
             {
